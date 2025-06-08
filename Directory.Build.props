@@ -13,5 +13,6 @@
 	<PackageTags>aspnetcore shared library web best-practices utils common extensions csharp webapp azure</PackageTags>
 	<Description>Shared library for CareerWay projects</Description>
 	<PackageOutputPath>$(SolutionDir)NuGetPackages</PackageOutputPath>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 </Project>

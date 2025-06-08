@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerWay.Shared.AspNetCore
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerWay.Shared.Authorization", "src\CareerWay.Shared.Authorization\CareerWay.Shared.Authorization.csproj", "{C680D3B8-0976-4A06-920E-1CE6064E8A20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerWay.Shared.MediatR", "src\CareerWay.Shared.MediatR\CareerWay.Shared.MediatR.csproj", "{1BC4E067-A1AB-4A85-970C-6BD16023DC6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -203,6 +205,10 @@ Global
 		{C680D3B8-0976-4A06-920E-1CE6064E8A20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C680D3B8-0976-4A06-920E-1CE6064E8A20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C680D3B8-0976-4A06-920E-1CE6064E8A20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BC4E067-A1AB-4A85-970C-6BD16023DC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC4E067-A1AB-4A85-970C-6BD16023DC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC4E067-A1AB-4A85-970C-6BD16023DC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC4E067-A1AB-4A85-970C-6BD16023DC6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,6 +245,7 @@ Global
 		{98EB242E-FE0E-4E50-8700-AAFF880D4070} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A5A0364A-9793-45ED-BB69-DAF79274E983} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{C680D3B8-0976-4A06-920E-1CE6064E8A20} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{1BC4E067-A1AB-4A85-970C-6BD16023DC6C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56C309AF-D935-4F90-9F1B-00158FD30009}
