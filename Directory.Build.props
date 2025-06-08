@@ -10,7 +10,8 @@
 	<PackageProjectUrl>https://careerway.com/</PackageProjectUrl>
 	<RepositoryType>git</RepositoryType>
     <PackageOutputPath>$(SolutionDir)NuGetPackages</PackageOutputPath>
-	<PackageTags>aspnetcore shared library web best-practices utils common extensions csharp webapp</PackageTags>
+	<PackageTags>aspnetcore shared library web best-practices utils common extensions csharp webapp azure</PackageTags>
 	<Description>Shared library for CareerWay projects</Description>
+	<PackageOutputPath>$(SolutionDir)NuGetPackages</PackageOutputPath>
   </PropertyGroup>
 </Project>
