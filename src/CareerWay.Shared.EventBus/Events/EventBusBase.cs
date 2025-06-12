@@ -38,7 +38,11 @@ public abstract class EventBusBase : IEventBus
 
     protected async Task ProcessEvent(string eventName, object integrationEvent)
     {
-        _logger.LogInformation("Processing the event: {EventName}", eventName);
+        var @event = integrationEvent as IntegrationEvent;
+        if (@event != null)
+        {
+            _logger.LogInformation("Processing the event {EventName} with correlationId {CorrelationId}", eventName, @event.CorrelationId);
+        }
 
         if (!SubscriptionsManager.HasSubscriptionsForEvent(eventName))
         {
@@ -60,6 +64,11 @@ public abstract class EventBusBase : IEventBus
             var eventType = SubscriptionsManager.GetEventTypeByName(eventName);
             var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
             await (Task)concreteType.GetMethod("HandleAsync")?.Invoke(handler, [integrationEvent])!;
+
+            if (@event != null)
+            {
+                _logger.LogInformation("Processing completed the event {EventName} with correlationId {CorrelationId}", eventName, @event.CorrelationId);
+            }
         }
     }
 
@@ -68,7 +77,7 @@ public abstract class EventBusBase : IEventBus
         return eventName
             .StripPrefix(EventBusOptions.EventNamePrefixToRemove)
             .StripSuffix(EventBusOptions.EventNameSuffixToRemove)
-            .Prepend($"{EventBusOptions.ProjectName}.");
+            .Prepend($"{EventBusOptions.ProjectName}.{EventBusOptions.ServiceName}.");
     }
 
     protected virtual string ProcessEventNamePattern(string eventName)

@@ -10,7 +10,7 @@ public class AzureKeyVaultService : IAzureKeyVaultService
 
     public AzureKeyVaultService(IOptions<AzureKeyVaultOptions> options)
     {
-        SecretClient = new SecretClient(options.Value.KeyVaultUri, new DefaultAzureCredential());
+        SecretClient = new SecretClient(options.Value.KeyVaultUri, new ClientSecretCredential("1", "1we", "1123"));
     }
 
     public async Task<string> GetSecretAsync(string secretName)

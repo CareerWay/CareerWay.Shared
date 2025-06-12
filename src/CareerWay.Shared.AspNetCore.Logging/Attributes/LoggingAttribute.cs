@@ -15,17 +15,25 @@ public class LoggingAttribute : Attribute
 
     public bool? IgnoreResponseBody { get; set; }
 
+    public string[]? ExcludedRequestHeaders { get; set; }
+
+    public string[]? ExcludedResponseHeaders { get; set; }
+
     public LoggingAttribute(
         LoggingLevel? logLevel = null,
         bool? ignoreRequestHeader = null,
         bool? ignoreRequestBody = null,
         bool? ignoreResponseHeader = null,
-        bool? ignoreResponseBody = null)
+        bool? ignoreResponseBody = null,
+        string[]? excludedRequestHeaders = null,
+        string[]? excludedResponseHeaders = null)
     {
         LoggingLevel = logLevel;
         IgnoreRequestHeader = ignoreRequestHeader;
         IgnoreRequestBody = ignoreRequestBody;
         IgnoreResponseHeader = ignoreResponseHeader;
         IgnoreResponseBody = ignoreResponseBody;
+        ExcludedRequestHeaders = excludedRequestHeaders;
+        ExcludedResponseHeaders = excludedResponseHeaders;
     }
 }

@@ -9,13 +9,18 @@ public static class IApplicationBuilderExtensions
         return applicationBuilder.UseMiddleware<RequestTimeMiddleware>();
     }
 
-    public static IApplicationBuilder UseEnableRequestBuffering(this IApplicationBuilder applicationBuilder)
+    public static IApplicationBuilder EnableRequestBuffering(this IApplicationBuilder applicationBuilder)
     {
         return applicationBuilder.UseMiddleware<EnableRequestBufferingMiddleware>();
     }
 
-    public static IApplicationBuilder UsePushSerilogPropertiesMiddleware(this IApplicationBuilder applicationBuilder)
+    public static IApplicationBuilder PushSerilogProperties(this IApplicationBuilder applicationBuilder)
     {
         return applicationBuilder.UseMiddleware<PushSerilogPropertiesMiddleware>();
+    }
+
+    public static IApplicationBuilder UseCorrelationId(this IApplicationBuilder applicationBuilder)
+    {
+        return applicationBuilder.UseMiddleware<CorrelationIdMiddleware>();
     }
 }

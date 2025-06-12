@@ -12,6 +12,12 @@ public class LoggingOptions
 
     public bool IgnoreResponseBody { get; set; }
 
+    public string[] ExcludedRequestHeaders { get; set; } = [];
+
+    public string[] ExcludedResponseHeaders { get; set; } = [];
+
+    public string[] ExcludedUrls { get; set; } = [];
+
     public LoggingOptions()
     {
     }
@@ -21,12 +27,18 @@ public class LoggingOptions
         bool ignoreRequestHeader = false,
         bool ignoreRequestBody = false,
         bool ignoreResponseHeader = false,
-        bool ignoreResponseBody = false)
+        bool ignoreResponseBody = false,
+        string[]? excludedRequestHeaders = null,
+        string[]? excludedResponseHeaders = null,
+        string[]? excludedUrls = null)
     {
         LoggingLevel = logLevel;
         IgnoreRequestHeader = ignoreRequestHeader;
         IgnoreRequestBody = ignoreRequestBody;
         IgnoreResponseHeader = ignoreResponseHeader;
         IgnoreResponseBody = ignoreResponseBody;
+        ExcludedRequestHeaders = excludedRequestHeaders ?? [];
+        ExcludedResponseHeaders = excludedResponseHeaders ?? [];
+        ExcludedUrls = excludedUrls ?? [];
     }
 }

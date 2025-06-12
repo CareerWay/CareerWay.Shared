@@ -18,6 +18,7 @@ public static class DependencyInjection
 
         return services
             .Configure(configureSnowflakeIdOptions)
-            .AddSingleton(idGenerator);
+            .AddSingleton(idGenerator)
+            .AddSingleton<ISnowflakeIdGenerator, SnowflakeIdGenerator>();
     }
 }

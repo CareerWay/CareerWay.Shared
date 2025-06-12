@@ -35,7 +35,7 @@ public class KafkaEventBus : EventBusBase
         var topicName = ProcessEventName(eventName);
         var body = await _kafkaSerilazer.SerializeAsync(integrationEvent);
         var message = new Message<Null, byte[]> { Value = body };
-        _logger.LogInformation("Publishing event to Kafka: {EventId}", integrationEvent.CorrelationId);
+        _logger.LogInformation("Publishing integration event {eventName} to the {topicName} topic with {correlationId} correlationId.", eventName, topicName, integrationEvent.CorrelationId);
         var producer = new ProducerBuilder<Null, byte[]>(_kafkaOptions.ProducerConfig).Build();
         await producer.ProduceAsync(topicName, message);
     }
@@ -44,7 +44,6 @@ public class KafkaEventBus : EventBusBase
     {
         var eventName = typeof(T).Name;
         SubscriptionsManager.AddSubscription<T, TH>();
-        _logger.LogInformation("Subscribing to event {EventName} with {EventHandler}", eventName, typeof(TH).GetGenericTypeName());
         StartConsume(eventName);
         await Task.CompletedTask;
     }
@@ -52,7 +51,6 @@ public class KafkaEventBus : EventBusBase
     public override async Task UnsubscribeAsync<T, TH>()
     {
         var eventName = SubscriptionsManager.GetEventName<T>();
-        _logger.LogInformation("Unsubscribing from event {EventName}", eventName);
         SubscriptionsManager.RemoveSubscription<T, TH>();
         await Task.CompletedTask;
     }
@@ -63,7 +61,7 @@ public class KafkaEventBus : EventBusBase
         {
             if (!CheckIfTopicExists(eventName))
             {
-                _logger.LogWarning("There is not topic for event {EventName}", eventName);
+                _logger.LogWarning("There is not topic for the event {EventName}", eventName);
             }
 
             while (!CheckIfTopicExists(eventName))
@@ -74,7 +72,7 @@ public class KafkaEventBus : EventBusBase
             var consumer = new ConsumerBuilder<Null, byte[]>(_kafkaOptions.ConsumerConfig).Build();
 
             consumer.Subscribe(ProcessEventNamePattern(eventName));
-            _logger.LogInformation("Starting Kafka consume for event {EventName}", eventName);
+            _logger.LogInformation("Starting Kafka consume for the event {EventName}", eventName);
 
             while (true)
             {
@@ -91,7 +89,7 @@ public class KafkaEventBus : EventBusBase
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, "An error occured processing event: {eventName}", eventName);
+                    _logger.LogError(exception, "An error occured processing the event {EventName}", eventName);
                 }
             }
         }, TaskCreationOptions.LongRunning);

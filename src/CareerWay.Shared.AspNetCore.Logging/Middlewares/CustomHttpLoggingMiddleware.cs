@@ -1,8 +1,11 @@
 ﻿using CareerWay.Shared.AspNetCore.Logging.Attributes;
 using CareerWay.Shared.AspNetCore.Logging.Models;
+using CareerWay.Shared.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
+using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 
 namespace CareerWay.Shared.AspNetCore.Logging.Middlewares;
 
@@ -10,17 +13,25 @@ public class CustomHttpLoggingMiddleware : IMiddleware
 {
     private readonly ILogger<CustomHttpLoggingMiddleware> _logger;
     private readonly LoggingOptions _loggingOptions;
-
+    private readonly IJsonSerializer _jsonSerializer;
     public CustomHttpLoggingMiddleware(
         ILogger<CustomHttpLoggingMiddleware> logger,
-        IOptions<LoggingOptions> loggingOptions)
+        IOptions<LoggingOptions> loggingOptions,
+        IJsonSerializer jsonSerializer)
     {
         _logger = logger;
         _loggingOptions = loggingOptions.Value;
+        _jsonSerializer = jsonSerializer;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        if (_loggingOptions.ExcludedUrls.Any(excludedUrls => excludedUrls == context.Request.Path))
+        {
+            await next(context);
+            return;
+        }
+
         Stream originalBody = context.Response.Body;
 
         try
@@ -56,9 +67,9 @@ public class CustomHttpLoggingMiddleware : IMiddleware
             return;
         }
 
-        if (!options.IgnoreRequestHeader) LogContext.PushProperty("RequestHeader", context.Request.GetHeaders());
+        if (!options.IgnoreRequestHeader) PushHeadersProperty(context.Request.Headers, options.ExcludedRequestHeaders, "RequestHeaders");
         if (!options.IgnoreRequestBody) LogContext.PushProperty("RequestBody", await context.Request.GetBodyAsync());
-        if (!options.IgnoreResponseHeader) LogContext.PushProperty("ResponseHeader", context.Response.GetHeaders());
+        if (!options.IgnoreResponseHeader) PushHeadersProperty(context.Response.Headers, options.ExcludedResponseHeaders, "ResponseHeaders");
         if (!options.IgnoreResponseBody) LogContext.PushProperty("ResponseBody", responseBody);
 
         LogContext.PushProperty("StatusCode", context.Response.StatusCode);
@@ -95,5 +106,33 @@ public class CustomHttpLoggingMiddleware : IMiddleware
             IgnoreResponseHeader = loggingAttribute.IgnoreResponseHeader ?? _loggingOptions.IgnoreResponseHeader,
             IgnoreResponseBody = loggingAttribute.IgnoreResponseBody ?? _loggingOptions.IgnoreResponseBody
         };
+    }
+
+    private void PushHeadersProperty(IHeaderDictionary headerDictionary, string[] excludedHeaders, string name)
+    {
+        var headerEntries = GetHeaders(headerDictionary, excludedHeaders);
+        var stringAsJson = _jsonSerializer.SerializeAsync(headerEntries).Result;
+        LogContext.PushProperty(name, headerEntries);
+    }
+
+    private List<HeaderEntry> GetHeaders(IHeaderDictionary headers, string[] excludedHeaders)
+    {
+        var headerEntries = new List<HeaderEntry>();
+        foreach (var header in headers)
+        {
+            if (excludedHeaders.Contains(header.Key, StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            foreach (var headerValue in header.Value)
+            {
+                if (headerValue != null)
+                {
+                    headerEntries.Add(new HeaderEntry { Key = header.Key, Value = headerValue });
+                }
+            }
+        }
+        return headerEntries;
     }
 }

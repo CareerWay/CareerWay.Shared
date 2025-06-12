@@ -17,4 +17,3 @@ public static class DependencyInjection
             .AddSingleton<ResourceManagerStringLocalizerFactory>();
     }
 }
-

@@ -11,30 +11,24 @@ public static class HttpRequestExtensions
         return queryString.IsNullOrWhiteSpace() ? null : queryString;
     }
 
-    public static string? GetHeader(this HttpRequest httpRequest, string key)
+    public static StringValues? GetHeader(this HttpRequest httpRequest, string key)
     {
         if (httpRequest.Headers.Keys.Count == 0)
         {
             return null;
         }
 
-        if (!httpRequest.Headers.TryGetValue(key, out StringValues value))
+        if (!httpRequest.Headers.TryGetValue(key, out StringValues values))
         {
             return null;
         }
 
-        return value.FirstOrDefault();
+        return values;
     }
 
-    public static string? GetHeaders(this HttpRequest httpRequest)
-    {
-        if (httpRequest.Headers.Keys.Count == 0)
-        {
-            return null;
-        }
-
-        string? header = httpRequest.Headers.Select(x => x.ToString()).Aggregate((key, value) => key + ", " + value);
-        return string.IsNullOrEmpty(header) ? null : header;
+    public static IHeaderDictionary GetHeaders(this HttpRequest httpRequest)
+    { 
+        return httpRequest.Headers;
     }
 
     public async static Task<string?> GetBodyAsync(this HttpRequest httpRequest)

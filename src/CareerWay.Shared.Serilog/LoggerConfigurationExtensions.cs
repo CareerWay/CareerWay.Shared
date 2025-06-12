@@ -15,6 +15,7 @@ public static class LoggerConfigurationExtensions
             .Enrich.With(new BaseLogEventEnricher("UserId"))
             .Enrich.With(new BaseLogEventEnricher("ClientIPAddress"))
             .Enrich.With(new BaseLogEventEnricher("ClientName"))
+            .Enrich.With(new BaseLogEventEnricher("TraceIdentifier"))
             .Enrich.With(new BaseLogEventEnricher("CorrelationId"))
             .Enrich.With(new BaseLogEventEnricher("RequestQueryString"))
             .Enrich.With(new BaseLogEventEnricher("RequestMethod"))

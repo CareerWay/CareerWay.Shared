@@ -13,5 +13,6 @@ public class ValidationFailureProblemDetails : ProblemDetails
         Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
         Instance = instance;
         Extensions.Add("errors", errors);
+        Extensions.Add("success", false);
     }
 }

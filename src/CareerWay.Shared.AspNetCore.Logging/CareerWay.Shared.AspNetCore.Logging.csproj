@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CareerWay.Shared.AspNetCore\CareerWay.Shared.AspNetCore.csproj" />
+    <ProjectReference Include="..\CareerWay.Shared.Json\CareerWay.Shared.Json.csproj" />
   </ItemGroup>
 
 </Project>

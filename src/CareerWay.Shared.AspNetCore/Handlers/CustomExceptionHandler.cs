@@ -2,6 +2,7 @@
 using CareerWay.Shared.Core.Exceptions;
 using CareerWay.Shared.Validation.Validation;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 
 namespace CareerWay.Shared.AspNetCore.Handlers;
 
@@ -16,6 +17,10 @@ public class CustomExceptionHandler : IExceptionHandler
             case ValidationFailureException validationFailureException:
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await httpContext.Response.WriteValidationFailureProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.ValidationFailureErrorMessage, validationFailureException.Errors);
+                break;
+            case BusinessException businessException:
+                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await httpContext.Response.WriteBusinessProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.BusinessErrorMessage, businessException.Errors);
                 break;
             case UnauthorizedAccessException:
                 httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -32,10 +37,6 @@ public class CustomExceptionHandler : IExceptionHandler
             case ConflictException:
                 httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
                 await httpContext.Response.WriteNotFoundProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.ConflictErrorMessage);
-                break;
-            case BusinessException businessException:
-                httpContext.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
-                await httpContext.Response.WriteBusinessProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.BusinessErrorMessage);
                 break;
             default:
                 httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

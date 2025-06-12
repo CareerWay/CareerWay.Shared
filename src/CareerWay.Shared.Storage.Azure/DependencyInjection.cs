@@ -15,6 +15,7 @@ public static class DependencyInjection
 
         return services
             .Configure(configureAzureBlobStorageOptions)
-            .AddSingleton<IStorage, IAzureStorage>();
+            .AddSingleton<IAzureStorage, AzureStorage>()
+            .AddSingleton<IStorage, AzureStorage>();
     }
 }
