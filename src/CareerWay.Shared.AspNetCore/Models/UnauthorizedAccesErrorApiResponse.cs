@@ -2,7 +2,7 @@
 
 public class UnauthorizedAccesErrorApiResponse : ErrorApiResponse
 {
-    public UnauthorizedAccesErrorApiResponse(string? detail, string? instance)
+    public UnauthorizedAccesErrorApiResponse(string? detail = null, string? instance = null)
     {
         Title = "Unauthorized Access";
         Detail = detail;

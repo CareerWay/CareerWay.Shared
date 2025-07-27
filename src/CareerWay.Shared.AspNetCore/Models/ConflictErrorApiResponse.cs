@@ -2,7 +2,7 @@
 
 public class ConflictErrorApiResponse : ErrorApiResponse
 {
-    public ConflictErrorApiResponse(string? detail, string? instance)
+    public ConflictErrorApiResponse(string? detail = null, string? instance = null)
     {
         Title = "Conflict";
         Detail = detail;

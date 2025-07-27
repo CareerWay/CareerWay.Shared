@@ -10,11 +10,12 @@ public interface IAzureStorage : IStorage
 
     public StorageSharedKeyCredential StorageSharedKeyCredential { get; }
 
-    string GenerateSasUri(
+    SasUriResult GenerateSasUri(
         string containerName,
         DateTimeOffset expiresOn,
-        string fileName,
-        string resource = "b",
-        BlobSasPermissions permissions = BlobSasPermissions.All
-    );
+        ResourceType resourceType,
+        string? fileName = null,
+        string? cacheControl = null,
+        string? contentType = null,
+        BlobSasPermissions permissions = BlobSasPermissions.All);
 }

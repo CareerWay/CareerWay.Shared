@@ -1,52 +1,93 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace CareerWay.Shared.Guids;
 
 public class SequentialGuidGenerator : IGuidGenerator
 {
-    private class NativeMethods
+    private static readonly RandomNumberGenerator RandomNumberGenerator = RandomNumberGenerator.Create();
+    private readonly SequentialGuidGeneratorOptions _options;
+
+    public SequentialGuidGenerator(IOptions<SequentialGuidGeneratorOptions> options)
     {
-        [DllImport("rpcrt4.dll", SetLastError = true)]
-        public static extern int UuidCreateSequential(out Guid guid);
+        _options = options.Value;
     }
 
     public Guid Generate()
     {
-        //Code is released into the public domain; no attribution required
-        const int RPC_S_OK = 0;
+        return Generate(_options.SequentialGuidType);
+    }
 
-        Guid guid;
-        int result = NativeMethods.UuidCreateSequential(out guid);
-        if (result != RPC_S_OK)
-            return Guid.NewGuid();
+    public Guid Generate(SequentialGuidType guidType)
+    {
+        // We start with 16 bytes of cryptographically strong random data.
+        var randomBytes = new byte[10];
+        RandomNumberGenerator.GetBytes(randomBytes);
 
-        //Endian swap the UInt32, UInt16, and UInt16 into the big-endian order (RFC specified order) that SQL Server expects
-        //See https://stackoverflow.com/a/47682820/12597
-        //Short version: UuidCreateSequential writes out three numbers in litte, rather than big, endian order
-        var s = guid.ToByteArray();
-        var t = new byte[16];
+        // An alternate method: use a normally-created GUID to get our initial
+        // random data:
+        // byte[] randomBytes = Guid.NewGuid().ToByteArray();
+        // This is faster than using RNGCryptoServiceProvider, but I don't
+        // recommend it because the .NET Framework makes no guarantee of the
+        // randomness of GUID data, and future versions (or different
+        // implementations like Mono) might use a different method.
 
-        //Endian swap UInt32
-        t[3] = s[0];
-        t[2] = s[1];
-        t[1] = s[2];
-        t[0] = s[3];
-        //Endian swap UInt16
-        t[5] = s[4];
-        t[4] = s[5];
-        //Endian swap UInt16
-        t[7] = s[6];
-        t[6] = s[7];
-        //The rest are already in the proper order
-        t[8] = s[8];
-        t[9] = s[9];
-        t[10] = s[10];
-        t[11] = s[11];
-        t[12] = s[12];
-        t[13] = s[13];
-        t[14] = s[14];
-        t[15] = s[15];
+        // Now we have the random basis for our GUID.  Next, we need to
+        // create the six-byte block which will be our timestamp.
 
-        return new Guid(t);
+        // We start with the number of milliseconds that have elapsed since
+        // DateTime.MinValue.  This will form the timestamp.  There's no use
+        // being more specific than milliseconds, since DateTime.Now has
+        // limited resolution.
+
+        // Using millisecond resolution for our 48-bit timestamp gives us
+        // about 5900 years before the timestamp overflows and cycles.
+        // Hopefully this should be sufficient for most purposes. :)
+        long timestamp = DateTime.UtcNow.Ticks / 10000L;
+
+        // Then get the bytes
+        byte[] timestampBytes = BitConverter.GetBytes(timestamp);
+
+        // Since we're converting from an Int64, we have to reverse on
+        // little-endian systems.
+        if (BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(timestampBytes);
+        }
+
+        byte[] guidBytes = new byte[16];
+
+        switch (guidType)
+        {
+            case SequentialGuidType.SequentialAsString:
+            case SequentialGuidType.SequentialAsBinary:
+
+                // For string and byte-array version, we copy the timestamp first, followed
+                // by the random data.
+                Buffer.BlockCopy(timestampBytes, 2, guidBytes, 0, 6);
+                Buffer.BlockCopy(randomBytes, 0, guidBytes, 6, 10);
+
+                // If formatting as a string, we have to compensate for the fact
+                // that .NET regards the Data1 and Data2 block as an Int32 and an Int16,
+                // respectively.  That means that it switches the order on little-endian
+                // systems.  So again, we have to reverse.
+                if (guidType == SequentialGuidType.SequentialAsString && BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(guidBytes, 0, 4);
+                    Array.Reverse(guidBytes, 4, 2);
+                }
+
+                break;
+
+            case SequentialGuidType.SequentialAtEnd:
+
+                // For sequential-at-the-end versions, we copy the random data first,
+                // followed by the timestamp.
+                Buffer.BlockCopy(randomBytes, 0, guidBytes, 0, 10);
+                Buffer.BlockCopy(timestampBytes, 2, guidBytes, 10, 6);
+                break;
+        }
+
+        return new Guid(guidBytes);
     }
 }

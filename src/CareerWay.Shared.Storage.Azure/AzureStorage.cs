@@ -25,31 +25,36 @@ public class AzureStorage : IAzureStorage
         return blobContainerClient.GetBlobs().Select(b => b.Name).ToList();
     }
 
-    public string GenerateSasUri(
+    public SasUriResult GenerateSasUri(
         string containerName,
         DateTimeOffset expiresOn,
-        string fileName,
-        string resource = "b",
+        ResourceType resourceType,
+        string? fileName = null,
+        string? cacheControl = null,
+        string? contentType = null,
         BlobSasPermissions permissions = BlobSasPermissions.All)
     {
         var fileExtension = Path.GetExtension(fileName);
-        var blobName = $"{Guid.NewGuid()}.{fileExtension}";
+        var blobName = fileExtension == null ? string.Empty : $"{Guid.NewGuid()}.{fileExtension}";
         var sasBuilder = new BlobSasBuilder(permissions, expiresOn)
         {
             BlobContainerName = containerName,
             BlobName = blobName,
-            Resource = resource
+            Resource = resourceType.GetDescription()
         };
 
+        if (cacheControl != null) sasBuilder.CacheControl = cacheControl;
+        if (contentType != null) sasBuilder.ContentType = contentType;
+
         var sasToken = sasBuilder.ToSasQueryParameters(StorageSharedKeyCredential).ToString();
-        UriBuilder fullUri = new UriBuilder()
+
+        return new SasUriResult()
         {
-            Scheme = "https",
-            Host = string.Format("{0}.blob.core.windows.net", StorageSharedKeyCredential.AccountName),
-            Path = string.Format("{0}/{1}", containerName, blobName),
-            Query = sasToken
+            AccountName = StorageSharedKeyCredential.AccountName,
+            ContainerName = containerName,
+            FileName = fileName,
+            Token = sasToken
         };
-        return fullUri.ToString();
     }
 
     public async Task<string> UploadAsync(string containerName, IFormFile file)

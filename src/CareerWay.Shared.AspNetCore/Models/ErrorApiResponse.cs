@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace CareerWay.Shared.AspNetCore.Models;
+﻿namespace CareerWay.Shared.AspNetCore.Models;
 
 public class ErrorApiResponse : BaseApiResponse
 {

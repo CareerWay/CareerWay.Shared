@@ -32,6 +32,15 @@ public static class StringExtensions
         return text.EndsWith(suffix) ? text.Substring(0, text.Length - suffix.Length) : text;
     }
 
+    public static string CapitalizeFirstLetter(this string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return input;
+        }
+        return char.ToUpper(input[0]) + input.Substring(1);
+    }
+
     public static string Prepend(this string text, string prefix)
     {
         if (text == null)

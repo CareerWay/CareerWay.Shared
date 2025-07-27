@@ -2,7 +2,6 @@
 using CareerWay.Shared.Core.Exceptions;
 using CareerWay.Shared.Validation.Validation;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 
 namespace CareerWay.Shared.AspNetCore.Handlers;
 
@@ -20,7 +19,7 @@ public class CustomExceptionHandler : IExceptionHandler
                 break;
             case BusinessException businessException:
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await httpContext.Response.WriteBusinessProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.BusinessErrorMessage, businessException.Errors);
+                await httpContext.Response.WriteBusinessProblemDetailsAsJsonAsync(exceptionMessage ?? ErrorMessages.BusinessErrorMessage, businessException.Title, businessException.Errors);
                 break;
             case UnauthorizedAccessException:
                 httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;

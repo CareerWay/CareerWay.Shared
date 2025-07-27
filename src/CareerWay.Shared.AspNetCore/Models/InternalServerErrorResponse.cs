@@ -2,7 +2,7 @@
 
 public class InternalServerErrorResponse : ErrorApiResponse
 {
-    public InternalServerErrorResponse(string? detail, string? instance)
+    public InternalServerErrorResponse(string? detail = null, string? instance = null)
     {
         Title = "Internal Server Error";
         Status = StatusCodes.Status500InternalServerError;

@@ -2,7 +2,7 @@
 
 public class NotFoundErrorApiResponse : ErrorApiResponse
 {
-    public NotFoundErrorApiResponse(string? detail, string? instance)
+    public NotFoundErrorApiResponse(string? detail = null, string? instance = null)
     {
         Title = "Not Found";
         Detail = detail;

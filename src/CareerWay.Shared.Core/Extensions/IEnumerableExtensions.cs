@@ -25,4 +25,9 @@ public static class IEnumerableExtensions
             ? source.Where(predicate)
             : source;
     }
+
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source)
+    {
+        return source == null || !source.Any();
+    }
 }

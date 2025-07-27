@@ -35,7 +35,7 @@ public class KafkaEventBus : EventBusBase
         var topicName = ProcessEventName(eventName);
         var body = await _kafkaSerilazer.SerializeAsync(integrationEvent);
         var message = new Message<Null, byte[]> { Value = body };
-        _logger.LogInformation("Publishing integration event {eventName} to the {topicName} topic with {correlationId} correlationId.", eventName, topicName, integrationEvent.CorrelationId);
+        _logger.LogInformation("Publishing the event {eventName} to the {topicName} topic with {correlationId} correlationId.", eventName, topicName, integrationEvent.CorrelationId);
         var producer = new ProducerBuilder<Null, byte[]>(_kafkaOptions.ProducerConfig).Build();
         await producer.ProduceAsync(topicName, message);
     }
@@ -66,13 +66,13 @@ public class KafkaEventBus : EventBusBase
 
             while (!CheckIfTopicExists(eventName))
             {
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromSeconds(15));
             }
 
             var consumer = new ConsumerBuilder<Null, byte[]>(_kafkaOptions.ConsumerConfig).Build();
 
             consumer.Subscribe(ProcessEventNamePattern(eventName));
-            _logger.LogInformation("Starting Kafka consume for the event {EventName}", eventName);
+            _logger.LogInformation("Starting consume for the event {EventName}", eventName);
 
             while (true)
             {
